@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  frontend:
+    container_name: app-frontend-dev
+    build:
+      context: ./frontend
+      dockerfile: dev/Dockerfile
+    env_file:
+      - .env
+      - .env.development
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  backend:
+    container_name: app-backend-dev
+    build:
+      context: ./backend
+      dockerfile: dev/Dockerfile
+    env_file:
+      - .env
+      - .env.development
+    ports:
+      - "${BACKEND_PORT:-4000}:4000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
