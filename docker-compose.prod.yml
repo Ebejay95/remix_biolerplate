@@ -1,24 +1,13 @@
 version: '3.8'
 
 services:
-  frontend:
-    container_name: app-frontend-prod
+  app:
+    container_name: remix-app-prod
     build:
-      context: ./frontend
+      context: .
       dockerfile: Dockerfile
     env_file:
       - .env
       - .env.production
     ports:
-      - "${FRONTEND_PORT:-3000}:3000"
-
-  backend:
-    container_name: app-backend-prod
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    env_file:
-      - .env
-      - .env.production
-    ports:
-      - "${BACKEND_PORT:-4000}:4000"
+      - "${PORT:-3000}:3000"
