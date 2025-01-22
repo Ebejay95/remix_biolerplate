@@ -38,3 +38,28 @@ Make sure to deploy the output of `npm run build`
 ## Styling
 
 This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
+
+```
+FRONTEND_PORT=
+BACKEND_PORT=
+NODE_ENV=
+FRONTEND_URL=
+HOST=
+REMIX_DEV_ORIGIN=
+
+# Database
+MONGODB_URI=
+
+# Email
+EMAIL_HOST=
+EMAIL_PORT=
+EMAIL_SERVICE=
+EMAIL_USER=
+EMAIL_PASSWORD=
+
+# Security
+BCRYPT_SALT_ROUNDS=
+SESSION_SECRET=
+MASTER_USER_EMAIL=
+MASTER_USER_PASSWORD=
+```
