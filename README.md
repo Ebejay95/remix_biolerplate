@@ -1,65 +1,93 @@
-# Welcome to Remix!
+# Welcome to Remix Project 🚀
 
-- 📖 [Remix docs](https://remix.run/docs)
+## 📖 Documentation
+- [Remix Official Docs](https://remix.run/docs)
 
-## Development
+## 🛠️ Development Setup
 
-Run the dev server:
+### Prerequisites
+- Docker
+- Node.js
+- npm or yarn
 
-```shellscript
+### Local Development
+To start the development server:
+
+```bash
+# Build and start development containers
+make development
+
+# Or use npm directly
 npm run dev
 ```
 
-## Deployment
+The app will be available at: http://localhost:3000
 
-First, build your app for production:
+### Production Deployment
+To build and run in production mode:
 
-```sh
+```bash
+# Build and start production containers
+make production
+
+# Or manually
 npm run build
-```
-
-Then run the app in production mode:
-
-```sh
 npm start
 ```
 
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-- `build/server`
-- `build/client`
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
+## 🔧 Environment Configuration
+Create a `.env.development` and `.env.production` file with the following configuration:
 
 ```
-FRONTEND_PORT=
-BACKEND_PORT=
-NODE_ENV=
-FRONTEND_URL=
-HOST=
-REMIX_DEV_ORIGIN=
+# Frontend Configuration
+FRONTEND_PORT=3000
+FRONTEND_URL=http://localhost:3000
+HOST=localhost
+REMIX_DEV_ORIGIN=http://localhost:3000
+NODE_ENV=development
 
-# Database
-MONGODB_URI=
+# Backend Configuration
+BACKEND_PORT=4000
 
-# Email
-EMAIL_HOST=
-EMAIL_PORT=
-EMAIL_SERVICE=
-EMAIL_USER=
-EMAIL_PASSWORD=
+# Database Configuration
+MONGODB_URI=mongodb://localhost:27017/your_database
 
-# Security
-BCRYPT_SALT_ROUNDS=
-SESSION_SECRET=
-MASTER_USER_EMAIL=
-MASTER_USER_PASSWORD=
+# Email Configuration
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_SERVICE=Gmail
+EMAIL_USER=your-email@example.com
+EMAIL_PASSWORD=your-app-password
+
+# Security Configuration
+BCRYPT_SALT_ROUNDS=10
+SESSION_SECRET=your-long-random-secret
+MASTER_USER_EMAIL=admin@example.com
+MASTER_USER_PASSWORD=secure-admin-password
 ```
+
+## 🐳 Docker Commands
+
+### Build and Start
+- Development: `make development`
+- Production: `make production`
+
+### Other Useful Commands
+- Stop containers: `make stop`
+- Remove containers and networks: `make prune`
+- View logs: `make logs`
+- Enter container shell:
+  - Development: `make enter-dev`
+  - Production: `make enter-prod`
+
+## 💅 Styling
+This project uses [Tailwind CSS](https://tailwindcss.com/) for styling. You can customize the configuration or replace it with your preferred CSS framework.
+
+## 🚀 Deployment
+- Build output is in `build/server` and `build/client`
+- Compatible with various Node.js hosting platforms
+
+## 📝 Notes
+- Keep sensitive information in `.env` files
+- Never commit `.env` files to version control
+- Use strong, unique passwords and secrets
