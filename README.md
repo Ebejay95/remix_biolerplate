@@ -80,7 +80,7 @@ MASTER_USER_PASSWORD=secure-admin-password
   - Development: `make enter-dev`
   - Production: `make enter-prod`
 
-## 💅 Styling
+## 😎 Styling
 This project uses [Tailwind CSS](https://tailwindcss.com/) for styling. You can customize the configuration or replace it with your preferred CSS framework.
 
 ## 🚀 Deployment
