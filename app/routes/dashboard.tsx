@@ -2,6 +2,7 @@ import { LoaderFunctionArgs, json } from "@remix-run/node";
 import { requireUserId } from "~/services/session.server";
 import { useLoaderData, Form, Link } from "@remix-run/react";
 import { User } from "~/models/user.server";
+import type { MetaFunction } from "@remix-run/node";
 
 type LoaderData = {
   currentUserId: string;
@@ -14,33 +15,68 @@ type LoaderData = {
   }>;
 };
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const currentUserId = await requireUserId(request);
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+  try {
+    const currentUserId = await requireUserId(request);
+    const isApi = params.type === 'api';
 
-  const users = await User.find({})
-    .select('email role verified createdAt')
-    .sort({ createdAt: -1 });
+    const users = await User.find({})
+      .select('email role verified createdAt')
+      .sort({ createdAt: -1 });
 
-  return json<LoaderData>({
-    currentUserId,
-    users: users.map(user => ({
-      _id: user._id.toString(),
-      email: user.email,
-      role: user.role,
-      verified: user.verified,
-      createdAt: user.createdAt.toLocaleString()
-    }))
-  });
+    const data = {
+      currentUserId,
+      users: users.map(user => ({
+        _id: user._id.toString(),
+        email: user.email,
+        role: user.role,
+        verified: user.verified,
+        createdAt: user.createdAt.toLocaleString()
+      }))
+    };
+
+    if (isApi) {
+      return json(data);
+    }
+
+    return json<LoaderData>(data);
+  } catch (error) {
+    if (error instanceof Response && error.status === 302 && params.type === 'api') {
+      return json({
+        error: "Unauthorized",
+        message: "Please log in to access this resource"
+      }, {
+        status: 401
+      });
+    }
+
+    if (error instanceof Response) {
+      throw error;
+    }
+
+    console.error('Error in dashboard route:', error);
+
+    if (params.type === 'api') {
+      return json({
+        error: "Internal Server Error",
+        message: "Failed to fetch dashboard data"
+      }, {
+        status: 500
+      });
+    }
+
+    throw new Error('Failed to load dashboard data');
+  }
 };
 
 export const meta: MetaFunction = () => {
-	return [
-		{ title: "Dashboard | Remix Boilerplate" },
-		{ name: "description", content: "Manage you app" },
-		{ property: "og:title", content: "Dashboard | Remix Boilerplate" },
-		{ property: "og:description", content: "Manage you app" },
-	];
-  };
+  return [
+    { title: "Dashboard | Remix Boilerplate" },
+    { name: "description", content: "Manage your app" },
+    { property: "og:title", content: "Dashboard | Remix Boilerplate" },
+    { property: "og:description", content: "Manage your app" },
+  ];
+};
 
 export default function Dashboard() {
   const { currentUserId, users } = useLoaderData<typeof loader>();
