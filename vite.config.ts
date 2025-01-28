@@ -22,7 +22,7 @@ export default defineConfig({
     tsconfigPaths(),
   ],
   server: {
-    port: process.env.PORT ? parseInt(process.env.PORT) : 3000,
+	port: process.env.PORT ? parseInt(process.env.PORT) : 3000,
     host: '0.0.0.0', // Wichtig: Dies erlaubt externe Verbindungen
     strictPort: true
   }
