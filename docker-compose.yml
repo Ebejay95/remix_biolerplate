@@ -7,7 +7,6 @@ services:
       context: .
       dockerfile: dev/Dockerfile
     env_file:
-      - .env
       - .env.development
     ports:
       - "${PORT:-3000}:3000"

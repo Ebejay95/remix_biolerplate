@@ -9,9 +9,10 @@ import { ensureMasterUser } from "./services/master-user.server";
 
 const ABORT_DELAY = 5_000;
 
-connectDB().catch(console.error);
-
-await ensureMasterUser().catch(console.error);
+let initPromise = Promise.all([
+	connectDB(),
+	ensureMasterUser()
+  ]).catch(console.error);
 export default function handleRequest(
   request: Request,
   responseStatusCode: number,

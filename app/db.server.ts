@@ -12,7 +12,7 @@ export async function connectDB() {
   try {
     const uri = process.env.MONGODB_URI.includes('remix_boilerplate')
       ? process.env.MONGODB_URI
-      : `${process.env.MONGODB_URI}/remix_boilerplate`;
+      : `${process.env.MONGODB_URI}remix_boilerplate`;
 
     await mongoose.connect(uri);
     isConnected = true;

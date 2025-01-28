@@ -10,7 +10,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const path = params["*"];
 
     try {
-      const route = await import(`./${path}.tsx`);
+		const route = await import(/* @vite-ignore */ `./${path}.tsx`);
 
       if (route.loader) {
         const response = await route.loader({ request, params });
