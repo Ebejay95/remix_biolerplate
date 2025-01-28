@@ -13,27 +13,30 @@ let initPromise = Promise.all([
 	connectDB(),
 	ensureMasterUser()
   ]).catch(console.error);
-export default function handleRequest(
-  request: Request,
-  responseStatusCode: number,
-  responseHeaders: Headers,
-  remixContext: EntryContext,
-  loadContext: AppLoadContext
-) {
-  return isbot(request.headers.get("user-agent") || "")
-    ? handleBotRequest(
-        request,
-        responseStatusCode,
-        responseHeaders,
-        remixContext
-      )
-    : handleBrowserRequest(
-        request,
-        responseStatusCode,
-        responseHeaders,
-        remixContext
-      );
-}
+  export default async function handleRequest(
+	request: Request,
+	responseStatusCode: number,
+	responseHeaders: Headers,
+	remixContext: EntryContext,
+	loadContext: AppLoadContext
+  ) {
+	// Wichtig: Warte auf die Initialisierung
+	await initPromise;
+
+	return isbot(request.headers.get("user-agent") || "")
+	  ? handleBotRequest(
+		  request,
+		  responseStatusCode,
+		  responseHeaders,
+		  remixContext
+		)
+	  : handleBrowserRequest(
+		  request,
+		  responseStatusCode,
+		  responseHeaders,
+		  remixContext
+		);
+  }
 
 function handleBotRequest(
   request: Request,

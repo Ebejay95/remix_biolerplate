@@ -23,7 +23,7 @@ export default defineConfig({
   ],
   server: {
     port: process.env.PORT ? parseInt(process.env.PORT) : 3000,
-    host: true, // Enables connections from network
-    strictPort: true // Fails if port is already in use
+    host: '0.0.0.0', // Wichtig: Dies erlaubt externe Verbindungen
+    strictPort: true
   }
 });
