@@ -22,9 +22,8 @@ export default defineConfig({
     tsconfigPaths(),
   ],
   server: {
-    port: process.env.PORT ? parseInt(process.env.PORT) : 3000,
-    host: true, // Change to true instead of '0.0.0.0'
-    strictPort: true
+    host: "0.0.0.0",
+    port: Number(process.env.PORT) || 3000,
   },
   build: {
     rollupOptions: {
