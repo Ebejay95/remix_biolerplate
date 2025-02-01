@@ -33,7 +33,7 @@ export default function Index() {
           </p>
         </div>
         <div className="flex justify-center btn-group">
-          <Link to="/login" className="btn-primary text-center">
+		  <Link to="/login" className="btn-primary text-center">
             Sign In
           </Link>
           <Link to="/about" className="btn-secondary text-center">

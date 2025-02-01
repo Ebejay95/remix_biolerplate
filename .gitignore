@@ -2,6 +2,4 @@ node_modules
 
 /.cache
 /build
-.env.development
-.env.production
 .env

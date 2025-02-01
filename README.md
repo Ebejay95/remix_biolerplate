@@ -1,93 +1,40 @@
-# Welcome to Remix Project 🚀
+# Welcome to Remix!
 
-## 📖 Documentation
-- [Remix Official Docs](https://remix.run/docs)
+- 📖 [Remix docs](https://remix.run/docs)
 
-## 🛠️ Development Setup
+## Development
 
-### Prerequisites
-- Docker
-- Node.js
-- npm or yarn
+Run the dev server:
 
-### Local Development
-To start the development server:
-
-```bash
-# Build and start development containers
-make development
-
-# Or use npm directly
+```shellscript
 npm run dev
 ```
 
-The app will be available at: http://localhost:3000
+## Deployment
 
-### Production Deployment
-To build and run in production mode:
+First, build your app for production:
 
-```bash
-# Build and start production containers
-make production
-
-# Or manually
+```sh
 npm run build
+```
+
+Then run the app in production mode:
+
+```sh
 npm start
 ```
 
-## 🔧 Environment Configuration
-Create a `.env.development` and `.env.production` file with the following configuration:
+Now you'll need to pick a host to deploy it to.
 
-```
-# Frontend Configuration
-FRONTEND_PORT=3000
-FRONTEND_URL=http://localhost:3000
-HOST=localhost
-REMIX_DEV_ORIGIN=http://localhost:3000
-NODE_ENV=development
+### DIY
 
-# Backend Configuration
-BACKEND_PORT=4000
+If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
 
-# Database Configuration
-MONGODB_URI=mongodb://localhost:27017/your_database
+Make sure to deploy the output of `npm run build`
 
-# Email Configuration
-EMAIL_HOST=smtp.example.com
-EMAIL_PORT=587
-EMAIL_SERVICE=Gmail
-EMAIL_USER=your-email@example.com
-EMAIL_PASSWORD=your-app-password
+- `build/server`
+- `build/client`
 
-# Security Configuration
-BCRYPT_SALT_ROUNDS=10
-SESSION_SECRET=your-long-random-secret
-MASTER_USER_EMAIL=admin@example.com
-MASTER_USER_PASSWORD=secure-admin-password
-```
+## Styling
 
-## 🐳 Docker Commands
-
-### Build and Start
-- Development: `make development`
-- Production: `make production`
-
-### Other Useful Commands
-- Stop containers: `make stop`
-- Remove containers and networks: `make prune`
-- View logs: `make logs`
-- Enter container shell:
-  - Development: `make enter-dev`
-  - Production: `make enter-prod`
-
-## 😎 Styling
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling. You can customize the configuration or replace it with your preferred CSS framework.
-
-## 🚀 Deployment
-- Build output is in `build/server` and `build/client`
-- Compatible with various Node.js hosting platforms
-
-## 📝 Notes
-- Keep sensitive information in `.env` files
-- Never commit `.env` files to version control
-- Use strong, unique passwords and secrets
+This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.

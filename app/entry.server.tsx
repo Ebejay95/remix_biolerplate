@@ -13,6 +13,7 @@ let initPromise = Promise.all([
 	connectDB(),
 	ensureMasterUser()
   ]).catch(console.error);
+  
   export default async function handleRequest(
 	request: Request,
 	responseStatusCode: number,
