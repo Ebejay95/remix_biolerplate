@@ -48,7 +48,7 @@ export default function Login() {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight">
-            Sign in to your account
+            Login to your account
           </h2>
           <p className="mt-2 text-sm opacity-75">
             Enter your credentials to access the dashboard
@@ -96,7 +96,7 @@ export default function Login() {
             )}
 
             <button type="submit" className="btn-primary w-full">
-              Sign in
+              Login
             </button>
           </Form>
         </div>

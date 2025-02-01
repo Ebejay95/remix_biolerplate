@@ -30,11 +30,6 @@ export async function ensureMasterUser() {
     const verifyUser = await User.findOne({ email: masterEmail }).select('+password');
     if (verifyUser) {
       const passwordValid = await bcrypt.compare(masterPassword, verifyUser.password);
-      console.log('Password verification test:', {
-        found: true,
-        passwordValid,
-        originalPassword: masterPassword
-      });
     }
 
   } catch (error) {

@@ -2,6 +2,7 @@ import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { getUserId } from "~/services/session.server";
+import { ProfileMenu } from "~/components/profile-menu";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await getUserId(request);
@@ -33,9 +34,6 @@ export default function Index() {
           </p>
         </div>
         <div className="flex justify-center btn-group">
-		  <Link to="/login" className="btn-primary text-center">
-            Sign In
-          </Link>
           <Link to="/about" className="btn-secondary text-center">
             About
           </Link>

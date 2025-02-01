@@ -1,7 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, Link } from "@remix-run/react";
-import { createUser } from "~/services/auth.server";
 import { validateEmail, validatePassword } from "~/utils/validations";
 import { requireUserId } from "~/services/session.server";
 

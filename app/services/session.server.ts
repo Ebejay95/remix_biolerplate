@@ -50,3 +50,26 @@ export async function logout(request: Request) {
     },
   });
 }
+
+
+export async function createUser(email: string, password: string, role: UserRole = 'user') {
+	const existingUser = await User.findOne({ email });
+	if (existingUser) {
+	  throw new Error("User already exists");
+	}
+
+	const verificationToken = crypto.randomBytes(32).toString('hex');
+
+	const user = await User.create({
+	  email,
+	  password,
+	  role,
+	  verificationToken,
+	  verified: role === 'master'
+	});
+
+	// typically send a verification email
+	// await sendVerificationEmail(email, verificationToken);
+
+	return user;
+  }
