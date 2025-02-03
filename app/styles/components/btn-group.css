@@ -1,0 +1,35 @@
+@layer components {
+	.btn-group {
+		@apply inline-flex rounded-md isolation-auto;
+	}
+
+	.btn-group > a,
+	.btn-group > button {
+		@apply -ml-px first:ml-0 relative;
+		@apply focus:z-10;
+	}
+
+	/* Single child - apply full rounded corners */
+	.btn-group > a:only-child,
+	.btn-group > button:only-child {
+		@apply rounded-md;
+	}
+
+	/* First child in a group of multiple */
+	.btn-group > a:first-child:not(:only-child),
+	.btn-group > button:first-child:not(:only-child) {
+		@apply rounded-l-md rounded-r-none;
+	}
+
+	/* Last child in a group of multiple */
+	.btn-group > a:last-child:not(:only-child),
+	.btn-group > button:last-child:not(:only-child) {
+		@apply rounded-r-md rounded-l-none;
+	}
+
+	/* Middle children */
+	.btn-group > a:not(:first-child):not(:last-child),
+	.btn-group > button:not(:first-child):not(:last-child) {
+		@apply rounded-none;
+	}
+}

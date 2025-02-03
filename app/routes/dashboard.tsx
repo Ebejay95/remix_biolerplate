@@ -1,31 +1,31 @@
-import { LoaderFunctionArgs, json } from "@remix-run/node";
-import { requireUserId } from "~/services/session.server";
-import { useLoaderData, Form, Link } from "@remix-run/react";
+import { json } from "@remix-run/node";
+import { useLoaderData, Link } from "@remix-run/react";
 import { User } from "~/models/user.server";
 import type { MetaFunction } from "@remix-run/node";
+import { generateMeta } from "~/utils/meta";
+import { createProtectedLoader, type AuthenticatedUser } from "~/services/session.server";
 
-type LoaderData = {
+interface LoaderData {
   currentUserId: string;
   users: Array<{
     _id: string;
     email: string;
-    role: string;
+    role: AuthenticatedUser['role'];
     verified: boolean;
     createdAt: string;
   }>;
-};
+}
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+export const loader = createProtectedLoader(async (authenticatedUser, { params }) => {
   try {
-    const currentUserId = await requireUserId(request);
     const isApi = params.type === 'api';
 
     const users = await User.find({})
       .select('email role verified createdAt')
       .sort({ createdAt: -1 });
 
-    const data = {
-      currentUserId,
+    const data: LoaderData = {
+      currentUserId: authenticatedUser._id,
       users: users.map(user => ({
         _id: user._id.toString(),
         email: user.email,
@@ -35,47 +35,27 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       }))
     };
 
-    if (isApi) {
-      return json(data);
-    }
+    return isApi ? json(data) : json<LoaderData>(data);
 
-    return json<LoaderData>(data);
   } catch (error) {
-    if (error instanceof Response && error.status === 302 && params.type === 'api') {
-      return json({
-        error: "Unauthorized",
-        message: "Please log in to access this resource"
-      }, {
-        status: 401
-      });
-    }
-
-    if (error instanceof Response) {
-      throw error;
-    }
-
     console.error('Error in dashboard route:', error);
 
     if (params.type === 'api') {
       return json({
         error: "Internal Server Error",
         message: "Failed to fetch dashboard data"
-      }, {
-        status: 500
-      });
+      }, { status: 500 });
     }
 
     throw new Error('Failed to load dashboard data');
   }
-};
+});
 
 export const meta: MetaFunction = () => {
-  return [
-    { title: "Dashboard | Remix Boilerplate" },
-    { name: "description", content: "Manage your app" },
-    { property: "og:title", content: "Dashboard | Remix Boilerplate" },
-    { property: "og:description", content: "Manage your app" },
-  ];
+  return generateMeta({
+    title: "Dashboard | Remix Boilerplate",
+    description: "Manage your app",
+  });
 };
 
 export default function Dashboard() {
@@ -83,12 +63,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen">
-      <header className="dashboard-header">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        </div>
-      </header>
-
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="dashboard-card rounded-lg">
           <div className="px-6 py-5 flex items-center justify-between border-b border-gray-200 dark:border-gray-800">
@@ -131,20 +105,10 @@ export default function Dashboard() {
                       <div className="text-sm font-medium">{user.email}</div>
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">
-                      <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold
-                        ${user.role === 'master' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200' :
-                          user.role === 'admin' ? 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200' :
-                          'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200'}`}>
-                        {user.role}
-                      </span>
+                      <RoleTag role={user.role} />
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">
-                      <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold
-                        ${user.verified ?
-                          'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200' :
-                          'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200'}`}>
-                        {user.verified ? 'Verified' : 'Unverified'}
-                      </span>
+                      <StatusTag verified={user.verified} />
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm opacity-75">
                       {user.createdAt}
@@ -157,5 +121,31 @@ export default function Dashboard() {
         </div>
       </main>
     </div>
+  );
+}
+
+function RoleTag({ role }: { role: AuthenticatedUser['role'] }) {
+  const styles = {
+    master: 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200',
+    admin: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200',
+    user: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200'
+  };
+
+  return (
+    <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${styles[role]}`}>
+      {role}
+    </span>
+  );
+}
+
+function StatusTag({ verified }: { verified: boolean }) {
+  const styles = verified
+    ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200'
+    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200';
+
+  return (
+    <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${styles}`}>
+      {verified ? 'Verified' : 'Unverified'}
+    </span>
   );
 }

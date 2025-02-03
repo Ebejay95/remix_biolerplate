@@ -1,13 +1,24 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 import { User } from "~/models/user.server";
-import { getUserId, createUserSession } from "~/services/session.server";
+import { createUserSession } from "~/services/session.server";
+import { getAuthenticatedUser } from "~/services/session.server";
+import { validateEmail } from "~/utils/validations";
 import bcrypt from "bcryptjs";
+import { generateMeta } from "~/utils/meta";
+
+interface ActionData {
+  errors?: {
+    email?: string;
+    password?: string;
+    form?: string;
+  };
+}
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const userId = await getUserId(request);
-  if (userId) {
+  const user = await getAuthenticatedUser(request);
+  if (user) {
     return redirect("/dashboard");
   }
   return null;
@@ -15,30 +26,60 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+  const email = formData.get("email");
+  const password = formData.get("password");
 
-  const user = await User.findOne({ email }).select('+password');
-  if (!user) {
-    return json({ error: "Invalid credentials" }, { status: 400 });
+  // Validate form inputs
+  const errors: ActionData["errors"] = {};
+
+  if (!email || typeof email !== "string") {
+    errors.email = "Email is required";
+  } else {
+    const emailError = validateEmail(email);
+    if (emailError) errors.email = emailError;
   }
 
-  const isValidPassword = await bcrypt.compare(password, user.password);
-  if (!isValidPassword) {
-    return json({ error: "Invalid credentials" }, { status: 400 });
+  if (!password || typeof password !== "string") {
+    errors.password = "Password is required";
   }
 
-  return createUserSession(user._id.toString(), "/dashboard");
+  if (Object.keys(errors).length > 0) {
+    return json<ActionData>({ errors }, { status: 400 });
+  }
+
+  try {
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+      return json<ActionData>(
+        { errors: { form: "Invalid credentials" } },
+        { status: 400 }
+      );
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      return json<ActionData>(
+        { errors: { form: "Invalid credentials" } },
+        { status: 400 }
+      );
+    }
+
+    return createUserSession(user._id.toString(), "/dashboard");
+  } catch (error) {
+    console.error("Login error:", error);
+    return json<ActionData>(
+      { errors: { form: "An error occurred during login" } },
+      { status: 500 }
+    );
+  }
 };
 
 export const meta: MetaFunction = () => {
-	return [
-		{ title: "Login | Remix Boilerplate" },
-		{ name: "description", content: "Login to the app" },
-		{ property: "og:title", content: "Login | Remix Boilerplate" },
-		{ property: "og:description", content: "Login to the app" },
-	];
-  };
+  return generateMeta({
+    title: "Login | Remix Boilerplate",
+    description: "Login to the app",
+  });
+};
 
 export default function Login() {
   const actionData = useActionData<typeof action>();
@@ -70,7 +111,13 @@ export default function Login() {
                   required
                   className="form-input rounded-md"
                   placeholder="Enter your email"
+                  aria-describedby={actionData?.errors?.email ? "email-error" : undefined}
                 />
+                {actionData?.errors?.email && (
+                  <p className="mt-1 text-sm text-red-500" id="email-error">
+                    {actionData.errors.email}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -87,12 +134,23 @@ export default function Login() {
                   required
                   className="form-input rounded-md"
                   placeholder="Enter your password"
+                  aria-describedby={actionData?.errors?.password ? "password-error" : undefined}
                 />
+                {actionData?.errors?.password && (
+                  <p className="mt-1 text-sm text-red-500" id="password-error">
+                    {actionData.errors.password}
+                  </p>
+                )}
               </div>
             </div>
 
-            {actionData?.error && (
-              <div className="text-sm text-red-500">{actionData.error}</div>
+            {actionData?.errors?.form && (
+              <div
+                className="text-sm text-red-500"
+                role="alert"
+              >
+                {actionData.errors.form}
+              </div>
             )}
 
             <button type="submit" className="btn-primary w-full">

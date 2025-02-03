@@ -1,159 +1,104 @@
-import { LoaderFunctionArgs, json } from "@remix-run/node";
-import { requireUserId } from "~/services/session.server";
-import { useLoaderData, Form, Link } from "@remix-run/react";
-import { User } from "~/models/user.server";
-import type { MetaFunction } from "@remix-run/node";
+// app/routes/profile.tsx
+import { json } from "@remix-run/node";
+import { useLoaderData, useActionData, Form } from "@remix-run/react";
+import { useState } from "react";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import { getProfile, updateProfile } from "../services/profile.server";
 
-type LoaderData = {
-  currentUserId: string;
-  users: Array<{
-    _id: string;
-    email: string;
-    role: string;
-    verified: boolean;
-    createdAt: string;
-  }>;
+export const loader: LoaderFunction = async ({ request }) => {
+  return getProfile(request);
 };
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-  try {
-    const currentUserId = await requireUserId(request);
-    const isApi = params.type === 'api';
-
-    const users = await User.find({})
-      .select('email role verified createdAt')
-      .sort({ createdAt: -1 });
-
-    const data = {
-      currentUserId,
-      users: users.map(user => ({
-        _id: user._id.toString(),
-        email: user.email,
-        role: user.role,
-        verified: user.verified,
-        createdAt: user.createdAt.toLocaleString()
-      }))
-    };
-
-    if (isApi) {
-      return json(data);
-    }
-
-    return json<LoaderData>(data);
-  } catch (error) {
-    if (error instanceof Response && error.status === 302 && params.type === 'api') {
-      return json({
-        error: "Unauthorized",
-        message: "Please log in to access this resource"
-      }, {
-        status: 401
-      });
-    }
-
-    if (error instanceof Response) {
-      throw error;
-    }
-
-    console.error('Error in dashboard route:', error);
-
-    if (params.type === 'api') {
-      return json({
-        error: "Internal Server Error",
-        message: "Failed to fetch dashboard data"
-      }, {
-        status: 500
-      });
-    }
-
-    throw new Error('Failed to load dashboard data');
-  }
+export const action: ActionFunction = async ({ request }) => {
+  return updateProfile(request);
 };
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "Dashboard | Remix Boilerplate" },
-    { name: "description", content: "Manage your app" },
-    { property: "og:title", content: "Dashboard | Remix Boilerplate" },
-    { property: "og:description", content: "Manage your app" },
-  ];
-};
-
-export default function Dashboard() {
-  const { currentUserId, users } = useLoaderData<typeof loader>();
+export default function Profile() {
+  const { user } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+  const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className="min-h-screen">
-      <header className="dashboard-header">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-gray-50">
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="dashboard-card rounded-lg">
-          <div className="px-6 py-5 flex items-center justify-between border-b border-gray-200 dark:border-gray-800">
-            <div>
-              <h2 className="text-xl font-semibold">User Management</h2>
-              <p className="mt-1 text-sm opacity-75">
-                Manage user accounts and permissions
-              </p>
-            </div>
-            <Link to="/register" className="btn-primary">
-              Add User
-            </Link>
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">Your Profile</h1>
+            {!isEditing && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                type="button"
+              >
+                Edit Profile
+              </button>
+            )}
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="dashboard-table min-w-full">
-              <thead>
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider opacity-75">
-                    Email
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider opacity-75">
-                    Role
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider opacity-75">
-                    Status
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider opacity-75">
-                    Created
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
-                {users.map((user) => (
-                  <tr
-                    key={user._id}
-                    className={`${user._id === currentUserId ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''} hover:bg-gray-50/50 dark:hover:bg-gray-800/50`}
-                  >
-                    <td className="whitespace-nowrap px-6 py-4">
-                      <div className="text-sm font-medium">{user.email}</div>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4">
-                      <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold
-                        ${user.role === 'master' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200' :
-                          user.role === 'admin' ? 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200' :
-                          'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200'}`}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4">
-                      <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold
-                        ${user.verified ?
-                          'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200' :
-                          'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200'}`}>
-                        {user.verified ? 'Verified' : 'Unverified'}
-                      </span>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm opacity-75">
-                      {user.createdAt}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {actionData?.error && (
+            <div className="mb-4 text-red-600">{actionData.error}</div>
+          )}
+
+          {actionData?.success && (
+            <div className="mb-4 text-green-600">Profile updated successfully</div>
+          )}
+
+          {isEditing ? (
+            <Form method="post" className="space-y-4">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  id="email"
+                  defaultValue={user.email}
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                  required
+                />
+              </div>
+
+              <div className="flex gap-4">
+                <button
+                  type="submit"
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                >
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                >
+                  Cancel
+                </button>
+              </div>
+            </Form>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-sm font-medium text-gray-500">Email</h3>
+                <p className="mt-1 text-sm text-gray-900">{user.email}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-500">Role</h3>
+                <p className="mt-1 text-sm text-gray-900">{user.role}</p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-500">Status</h3>
+                <p className="mt-1 text-sm text-gray-900">
+                  {user.verified ? 'Verified' : 'Not Verified'}
+                </p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-500">Member Since</h3>
+                <p className="mt-1 text-sm text-gray-900">
+                  {new Date(user.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>

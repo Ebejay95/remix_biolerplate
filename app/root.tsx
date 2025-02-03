@@ -1,112 +1,105 @@
-// app/root.tsx
 import {
-	Links,
-	Meta,
-	Outlet,
-	Scripts,
-	ScrollRestoration,
-	useLoaderData,
-  } from "@remix-run/react";
-  import type { LinksFunction, LoaderFunction } from "@remix-run/node";
-  import { json } from "@remix-run/node";
-  import { User } from "~/models/user.server";
-  import { getUserId } from "./services/session.server";
-  import { ProfileMenu } from "~/components/profile-menu";
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useLoaderData,
+  useMatches,
+} from "@remix-run/react";
+import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { ProfileMenu } from "~/components/profile-menu";
+import { getAuthenticatedUser, type AuthenticatedUser } from "~/services/session.server";
+import { Link } from "@remix-run/react";
+import "./styles/tailwind.css";
 
-  import "./tailwind.css";
+interface LoaderData {
+  user: AuthenticatedUser | null;
+}
 
-  export const links: LinksFunction = () => [
-	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
-	{
-	  rel: "preconnect",
-	  href: "https://fonts.gstatic.com",
-	  crossOrigin: "anonymous",
-	},
-	{
-	  rel: "stylesheet",
-	  href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-	},
-  ];
+export const links: LinksFunction = () => [
+  { rel: "preconnect", href: "https://fonts.googleapis.com" },
+  {
+    rel: "preconnect",
+    href: "https://fonts.gstatic.com",
+    crossOrigin: "anonymous",
+  },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+  },
+];
 
-  interface LoaderData {
-	user: {
-	  _id: string;
-	  email: string;
-	  role: 'user' | 'admin' | 'master';
-	  verified: boolean;
-	  createdAt: string;
-	} | null;
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const user = await getAuthenticatedUser(request);
+  return json<LoaderData>({ user });
+};
+
+function getPageTitle(matches: ReturnType<typeof useMatches>) {
+  for (const match of [...matches].reverse()) {
+    if (match.handle?.meta) {
+      const meta = Array.isArray(match.handle.meta)
+        ? match.handle.meta
+        : match.handle.meta({});
+
+      const title = meta.find(m => m.title)?.title;
+      if (title) return title;
+    }
+
+    if (match.data?.meta) {
+      const meta = Array.isArray(match.data.meta)
+        ? match.data.meta
+        : (typeof match.data.meta === 'function'
+          ? match.data.meta({})
+          : match.data.meta);
+
+      const title = meta.find(m => m.title)?.title;
+      if (title) return title;
+    }
   }
 
-  export const loader: LoaderFunction = async ({ request }) => {
-	try {
-	  const userId = await getUserId(request);
+  return "Dashboard";
+}
 
-	  if (!userId) {
-		return json<LoaderData>({ user: null });
-	  }
+function Document({ children }: { children: React.ReactNode }) {
+  const data = useLoaderData<typeof loader>();
+  const matches = useMatches();
+  const title = getPageTitle(matches);
 
-	  const user = await User.findById(userId).select('-password');
+  return (
+    <html lang="en" className="h-full">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+        <Links />
+      </head>
+      <body className="h-full">
+        <div className="min-h-full">
+          <header className="dashboard-header">
+            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex items-center justify-between">
+              <Link to="/"><h1 className="text-3xl font-bold tracking-tight">{title}</h1></Link>
+              <nav className="bg-white shadow-sm dark:bg-gray-800">
+                <ProfileMenu user={data?.user ?? null} />
+              </nav>
+            </div>
+          </header>
+          <main>
+            {children}
+          </main>
+        </div>
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
 
-	  if (!user) {
-		return json<LoaderData>({ user: null });
-	  }
+export function Layout({ children }: { children: React.ReactNode }) {
+  return <Document>{children}</Document>;
+}
 
-	  return json<LoaderData>({
-		user: {
-		  _id: user._id.toString(),
-		  email: user.email,
-		  role: user.role,
-		  verified: user.verified,
-		  createdAt: user.createdAt.toISOString(),
-		}
-	  });
-	} catch (error) {
-	  console.error('Loader error:', error);
-	  return json<LoaderData>({ user: null });
-	}
-  };
-
-  function Document({ children }: { children: React.ReactNode }) {
-	const data = useLoaderData<LoaderData>();
-
-	return (
-	  <html lang="en" className="h-full">
-		<head>
-		  <meta charSet="utf-8" />
-		  <meta name="viewport" content="width=device-width, initial-scale=1" />
-		  <Meta />
-		  <Links />
-		</head>
-		<body className="h-full">
-		  <div className="min-h-full">
-			<nav className="bg-white shadow-sm dark:bg-gray-800">
-			  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-				<div className="flex justify-between h-16">
-				  <div className="flex">
-					{/* Logo und Navigation hier */}
-				  </div>
-				  <div className="flex items-center">
-					<ProfileMenu user={data.user} />
-				  </div>
-				</div>
-			  </div>
-			</nav>
-			<main>
-			  {children}
-			</main>
-		  </div>
-		  <ScrollRestoration />
-		  <Scripts />
-		</body>
-	  </html>
-	);
-  }
-
-  export function Layout({ children }: { children: React.ReactNode }) {
-	return <Document>{children}</Document>;
-  }
-
-  export default function App() {
-	return <Outlet />;
-  }
+export default function App() {
+  return <Outlet />;
+}
