@@ -1,24 +1,29 @@
-// app/routes/profile.tsx
-import { json } from "@remix-run/node";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useActionData, Form } from "@remix-run/react";
 import { useState } from "react";
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { getProfile, updateProfile } from "../services/profile.server";
+import { ProfileController } from "~/controllers/profile.server";
+import { createMetaFunction } from "~/utils/meta";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  return getProfile(request);
+ return ProfileController.getProfile(request);
 };
 
 export const action: ActionFunction = async ({ request }) => {
-  return updateProfile(request);
+ return ProfileController.updateProfile(request);
 };
 
-export default function Profile() {
-  const { user } = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
-  const [isEditing, setIsEditing] = useState(false);
+export const meta = createMetaFunction({
+ title: "Profile | Remix Boilerplate",
+ description: "Manage your profile settings"
+});
 
-  return (
+export default function Profile() {
+ const { user } = useLoaderData<typeof loader>();
+ const actionData = useActionData<typeof action>();
+ const [isEditing, setIsEditing] = useState(false);
+
+ // JSX bleibt unverändert
+ return (
     <div className="min-h-screen bg-gray-50">
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow p-6">

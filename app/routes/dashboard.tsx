@@ -1,61 +1,60 @@
-import { json } from "@remix-run/node";
+// app/routes/dashboard.tsx
 import { useLoaderData, Link } from "@remix-run/react";
-import { User } from "~/models/user.server";
-import type { MetaFunction } from "@remix-run/node";
-import { generateMeta } from "~/utils/meta";
-import { createProtectedLoader, type AuthenticatedUser } from "~/services/session.server";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { UserController } from "~/controllers/user.server";
+import { AuthController } from "~/controllers/auth.server";
+import { createMetaFunction } from "~/utils/meta";
+import type { AuthUser } from "~/controllers/auth.server";
 
-interface LoaderData {
-  currentUserId: string;
-  users: Array<{
-    _id: string;
-    email: string;
-    role: AuthenticatedUser['role'];
-    verified: boolean;
-    createdAt: string;
-  }>;
-}
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const user = await AuthController.requireAuthenticatedUser(request);
+  const users = await UserController.getUsers();
 
-export const loader = createProtectedLoader(async (authenticatedUser, { params }) => {
-  try {
-    const isApi = params.type === 'api';
+  return json({
+    currentUserId: user._id,
+    users: users.map(user => ({
+      _id: user._id,
+      email: user.email,
+      role: user.role,
+      verified: user.verified,
+      createdAt: user.createdAt
+    }))
+  });
+};
 
-    const users = await User.find({})
-      .select('email role verified createdAt')
-      .sort({ createdAt: -1 });
-
-    const data: LoaderData = {
-      currentUserId: authenticatedUser._id,
-      users: users.map(user => ({
-        _id: user._id.toString(),
-        email: user.email,
-        role: user.role,
-        verified: user.verified,
-        createdAt: user.createdAt.toLocaleString()
-      }))
-    };
-
-    return isApi ? json(data) : json<LoaderData>(data);
-
-  } catch (error) {
-    console.error('Error in dashboard route:', error);
-
-    if (params.type === 'api') {
-      return json({
-        error: "Internal Server Error",
-        message: "Failed to fetch dashboard data"
-      }, { status: 500 });
-    }
-
-    throw new Error('Failed to load dashboard data');
-  }
+export const meta = createMetaFunction({
+  title: "Dashboard | Admin",
+  description: "Manage your application"
 });
 
-export const meta: MetaFunction = () => {
-  return generateMeta({
-    title: "Dashboard | Remix Boilerplate",
-    description: "Manage your app",
-  });
+interface Props {
+  role: AuthUser['role'];
+  verified: boolean;
+}
+
+const RoleTag = ({ role }: Pick<Props, 'role'>) => {
+  const styles = {
+    master: 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200',
+    admin: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200',
+    user: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200'
+  };
+  return (
+    <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${styles[role]}`}>
+      {role}
+    </span>
+  );
+};
+
+const StatusTag = ({ verified }: Pick<Props, 'verified'>) => {
+  const styles = verified
+    ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200'
+    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200';
+  return (
+    <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${styles}`}>
+      {verified ? 'Verified' : 'Unverified'}
+    </span>
+  );
 };
 
 export default function Dashboard() {
@@ -121,31 +120,5 @@ export default function Dashboard() {
         </div>
       </main>
     </div>
-  );
-}
-
-function RoleTag({ role }: { role: AuthenticatedUser['role'] }) {
-  const styles = {
-    master: 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200',
-    admin: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200',
-    user: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200'
-  };
-
-  return (
-    <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${styles[role]}`}>
-      {role}
-    </span>
-  );
-}
-
-function StatusTag({ verified }: { verified: boolean }) {
-  const styles = verified
-    ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200'
-    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200';
-
-  return (
-    <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${styles}`}>
-      {verified ? 'Verified' : 'Unverified'}
-    </span>
   );
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Form, Link, useLocation } from '@remix-run/react';
 import { ChevronDown, LogOut, UserCircle, Settings } from 'lucide-react';
-import type { AuthenticatedUser } from '~/services/session.server';
+import type { AuthenticatedUser } from '~/controllers/auth.server';
 
 interface ProfileMenuProps {
   user: AuthenticatedUser | null;

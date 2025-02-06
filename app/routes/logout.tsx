@@ -1,11 +1,11 @@
+// app/routes/logout.tsx
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { logout, getUserId } from "~/services/session.server";
+import { AuthController } from "~/controllers/auth.server";
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-	return logout(request);
+export const action = ({ request }: ActionFunctionArgs) => {
+ return AuthController.logout(request);
 };
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-	return logout(request);
+export const loader = ({ request }: LoaderFunctionArgs) => {
+ return AuthController.logout(request);
 };
