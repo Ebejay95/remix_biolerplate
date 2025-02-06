@@ -1,0 +1,11 @@
+
+
+.react-grid-item > .react-resizable-handle.react-resizable-handle-se::after{
+    border-right: 2px solid rgba(255, 255, 255, 1);
+    border-bottom: 2px solid rgba(255, 255, 255, 1);
+	border-radius: 0 0 4px 0;
+}
+
+.react-grid-item.react-grid-placeholder {
+	background-color: rgba(255,255,255,0.4);
+}

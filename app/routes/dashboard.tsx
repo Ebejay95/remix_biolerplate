@@ -6,6 +6,10 @@ import { UserController } from "~/controllers/user.server";
 import { AuthController } from "~/controllers/auth.server";
 import { createMetaFunction } from "~/utils/meta";
 import type { AuthUser } from "~/controllers/auth.server";
+import React from 'react';
+import GridLayout from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await AuthController.requireAuthenticatedUser(request);
@@ -59,7 +63,11 @@ const StatusTag = ({ verified }: Pick<Props, 'verified'>) => {
 
 export default function Dashboard() {
   const { currentUserId, users } = useLoaderData<typeof loader>();
-
+const layout = [
+  { i: 'a', x: 0, y: 0, w: 2, h: 2 },
+  { i: 'b', x: 2, y: 0, w: 2, h: 2 },
+  { i: 'c', x: 4, y: 0, w: 2, h: 2 }
+];
   return (
     <div className="min-h-screen">
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -118,6 +126,11 @@ export default function Dashboard() {
             </table>
           </div>
         </div>
+		<GridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
+			<div className="dashboard-card p-6 rounded-lg" key="a">A</div>
+			<div className="dashboard-card p-6 rounded-lg" key="b">B</div>
+			<div className="dashboard-card p-6 rounded-lg" key="c">C</div>
+		</GridLayout>
       </main>
     </div>
   );

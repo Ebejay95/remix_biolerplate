@@ -26,25 +26,32 @@ export default function About() {
        <div className="mt-16">
          <h2 className="text-2xl font-bold tracking-tight">Features</h2>
          <div className="mt-6 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-           {features.map((feature, index) => (
-             <div key={index} className="dashboard-card p-6 rounded-lg">
-               <h3 className="text-lg font-semibold">{feature.title}</h3>
-               <p className="mt-2 text-sm opacity-75">{feature.description}</p>
+             <div className="dashboard-card p-6 rounded-lg">
+               <h3 className="text-lg font-semibold">About</h3>
+               <p className="mt-2 text-sm opacity-75">Text</p>
              </div>
-           ))}
+             <div className="dashboard-card p-6 rounded-lg">
+               <h3 className="text-lg font-semibold">About</h3>
+               <p className="mt-2 text-sm opacity-75">Text</p>
+             </div>
+             <div className="dashboard-card p-6 rounded-lg">
+               <h3 className="text-lg font-semibold">About</h3>
+               <p className="mt-2 text-sm opacity-75">Text</p>
+             </div>
          </div>
        </div>
 
        <div className="mt-16">
          <h2 className="text-2xl font-bold tracking-tight">Our Team</h2>
          <div className="mt-6 grid gap-8 md:grid-cols-2">
-           {team.map((member, index) => (
-             <div key={index} className="dashboard-card p-6 rounded-lg">
-               <h3 className="text-lg font-semibold">{member.name}</h3>
-               <p className="mt-1 text-sm font-medium opacity-75">{member.role}</p>
-               <p className="mt-4 text-sm opacity-75">{member.bio}</p>
+             <div className="dashboard-card p-6 rounded-lg">
+               <h3 className="text-lg font-semibold">About</h3>
+               <p className="mt-2 text-sm opacity-75">Text</p>
              </div>
-           ))}
+             <div className="dashboard-card p-6 rounded-lg">
+               <h3 className="text-lg font-semibold">About</h3>
+               <p className="mt-2 text-sm opacity-75">Text</p>
+             </div>
          </div>
        </div>
 
