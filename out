@@ -26,6 +26,8 @@ utils
 
 ./app/components:
 profile-menu.tsx
+slide-in-editor.tsx
+table.tsx
 
 ./app/controllers:
 api.server.ts
@@ -57,6 +59,7 @@ tailwind.css
 ./app/styles/components:
 btn-group.css
 btn.css
+dashboard.css
 
 ./app/utils:
 meta.tsx

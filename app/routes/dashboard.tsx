@@ -7,7 +7,8 @@ import { createMetaFunction } from "~/utils/meta";
 import type { AuthUser } from "~/controllers/auth.server";
 import React, { useState, useCallback} from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import { DynamicTable } from "../components/table"
+import { DynamicTable } from "~/components/table";
+import SlideInEditor from '~/components/slide-in-editor';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
@@ -50,7 +51,10 @@ const generateLayout = () => ({
 export default function Dashboard() {
   const { currentUserId, users } = useLoaderData<typeof loader>();
   const [layouts, setLayouts] = useState(generateLayout());
-  const [isInteractingWithContent, setIsInteractingWithContent] = useState(false);
+	const [isInteractingWithContent, setIsInteractingWithContent] = useState(false);
+	  const [selectedUser, setSelectedUser] = useState(null);
+
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   const handleLayoutChange = (_, allLayouts) => {
     console.log('Layout changed:', allLayouts);
@@ -64,7 +68,15 @@ export default function Dashboard() {
   const handleContentMouseLeave = useCallback(() => {
     setIsInteractingWithContent(false);
   }, []);
+  const handleRowClick = (user) => {
+    setSelectedUser(user);
+    setIsEditorOpen(true);
+  };
 
+  const handleEditorClose = () => {
+    setIsEditorOpen(false);
+    setSelectedUser(null);
+  };
   return (
     <div className="min-h-screen">
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -105,6 +117,7 @@ export default function Dashboard() {
                   data={users}
                   highlightedId={currentUserId}
                   excludeFields={['password', '__v']}
+                  onRowClick={handleRowClick}
                 />
               </div>
             </div>
@@ -122,7 +135,13 @@ export default function Dashboard() {
             >
               {/* Content for pending verifications */}
             </div>
-          </ResponsiveGridLayout>
+			</ResponsiveGridLayout>
+			<SlideInEditor
+          	  isOpen={isEditorOpen}
+          	  onClose={handleEditorClose}
+          	  data={selectedUser}
+          	  title="User Details"
+          	/>
         </div>
       </main>
     </div>

@@ -5,29 +5,28 @@ interface TableProps<T> {
   highlightedId?: string;
   idField?: keyof T;
   excludeFields?: string[];
+  onRowClick?: (item: T) => void;
 }
 
 export const DynamicTable = <T extends Record<string, any>>({
   data,
   highlightedId,
   idField = '_id',
-  excludeFields = []
+  excludeFields = [],
+  onRowClick
 }: TableProps<T>) => {
   if (!data.length) return null;
 
-  // Get column headers from the first data item
   const columns = Object.keys(data[0]).filter(key => !excludeFields.includes(key));
 
-  // Function to format header text
   const formatHeader = (header: string) => {
     return header
-      .replace(/([A-Z])/g, ' $1') // Add space before capital letters
-      .replace(/_/g, ' ') // Replace underscores with spaces
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/_/g, ' ')
       .trim()
-      .replace(/\b\w/g, char => char.toUpperCase()); // Capitalize first letter of each word
+      .replace(/\b\w/g, char => char.toUpperCase());
   };
 
-  // Function to format cell content
   const formatCell = (value: any) => {
     if (value === null || value === undefined) return '-';
     if (typeof value === 'boolean') return value ? 'Yes' : 'No';
@@ -55,9 +54,11 @@ export const DynamicTable = <T extends Record<string, any>>({
           {data.map((item) => (
             <tr
               key={String(item[idField])}
+              onClick={() => onRowClick?.(item)}
               className={`
                 ${highlightedId === item[idField] ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''}
                 hover:bg-gray-50/50 dark:hover:bg-gray-800/50
+                cursor-pointer
               `}
             >
               {columns.map((column) => (

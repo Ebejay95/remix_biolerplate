@@ -1,6 +1,7 @@
 @import 'components/btn-group.css';
 @import 'components/btn.css';
 @import 'components/dashboard.css';
+@import 'components/slide-editor.css';
 
 
 @tailwind base;

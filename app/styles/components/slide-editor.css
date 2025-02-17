@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .slide-in-editor {
+    @apply fixed top-0 right-0 h-full w-96;
+    @apply bg-white dark:bg-gray-800;
+    @apply shadow-lg;
+    @apply transform transition-transform duration-300 ease-in-out;
+  }
+
+  .slide-in-editor-header {
+    @apply p-4;
+    @apply border-b border-gray-200 dark:border-gray-700;
+    @apply flex justify-between items-center;
+  }
+
+  .slide-in-editor-title {
+    @apply text-xl font-semibold;
+    @apply text-gray-900 dark:text-gray-100;
+  }
+
+  .slide-in-editor-close {
+    @apply p-2;
+    @apply rounded-full;
+    @apply text-gray-500 dark:text-gray-400;
+    @apply hover:bg-gray-100 dark:hover:bg-gray-700;
+    @apply transition-colors duration-200;
+  }
+
+  .slide-in-editor-content {
+    @apply flex-1 overflow-y-auto p-4;
+    @apply text-gray-900 dark:text-gray-100;
+  }
+
+  .slide-in-editor-field {
+    @apply border-b border-gray-200 dark:border-gray-700 pb-4;
+  }
+
+  .slide-in-editor-label {
+    @apply block text-sm font-medium mb-1 opacity-75;
+    @apply text-gray-700 dark:text-gray-300;
+  }
+
+  .slide-in-editor-value {
+    @apply text-base;
+    @apply text-gray-900 dark:text-gray-100;
+  }
+
+  .slide-in-editor-footer {
+    @apply p-4;
+    @apply border-t border-gray-200 dark:border-gray-700;
+    @apply bg-white dark:bg-gray-800;
+  }
+
+  .slide-in-editor-button {
+    @apply px-4 py-2;
+    @apply border border-gray-300 dark:border-gray-600;
+    @apply rounded;
+    @apply text-gray-700 dark:text-gray-300;
+    @apply hover:bg-gray-100 dark:hover:bg-gray-700;
+    @apply transition-colors duration-200;
+  }
+
+  .slide-in-editor-overlay {
+    @apply fixed inset-0;
+    @apply bg-black bg-opacity-25 dark:bg-opacity-50;
+    @apply transition-opacity duration-300;
+  }
+}
+
+/* Scrollbar styles */
+.slide-in-editor-content::-webkit-scrollbar {
+  width: 8px;
+  background-color: transparent;
+}
+
+.slide-in-editor-content::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgb(156, 163, 175, 0.3);
+}
+
+.slide-in-editor-content::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  .slide-in-editor-content::-webkit-scrollbar-thumb {
+    background-color: rgb(75, 85, 99, 0.3);
+  }
+}
+
+/* Firefox scrollbar styles */
+.slide-in-editor-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  .slide-in-editor-content {
+    scrollbar-color: rgba(75, 85, 99, 0.3) transparent;
+  }
+}
