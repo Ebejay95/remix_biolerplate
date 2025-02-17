@@ -6,6 +6,57 @@
 	border-radius: 0 0 4px 0;
 }
 
-.react-grid-item.react-grid-placeholder {
-	background-color: rgba(255,255,255,0.4);
+	.react-grid-item.react-grid-placeholder {
+		background: rgba(0, 0, 0, 0.2)!important;
+		opacity: 0.1;
+		transition-duration: 100ms;
+		z-index: 2;
+		-webkit-user-select: none;
+		-o-user-select: none;
+		user-select: none;
+	}
+@media (prefers-color-scheme: dark) {
+	.react-grid-item.react-grid-placeholder {
+		background: rgba(255, 255, 255, 0.1)!important;
+	}
+}
+
+/* Scrollbar customization for dashboard cards */
+.dashboard-grid .dashboard-card .dashboard-card-content {
+    overflow-y: scroll;
+    height: 100%;
+}
+
+/* Webkit scrollbar styles */
+.dashboard-grid .dashboard-card .dashboard-card-content::-webkit-scrollbar {
+    width: 8px;
+    background-color: transparent;
+}
+
+.dashboard-grid .dashboard-card .dashboard-card-content::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgb(156, 163, 175, 0.3); /* Light mode thumb */
+}
+
+.dashboard-grid .dashboard-card .dashboard-card-content::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+/* Dark mode scrollbar */
+@media (prefers-color-scheme: dark) {
+    .dashboard-grid .dashboard-card .dashboard-card-content::-webkit-scrollbar-thumb {
+        background-color: rgb(75, 85, 99, 0.3); /* Dark mode thumb */
+    }
+}
+
+/* Firefox scrollbar styles */
+.dashboard-grid .dashboard-card .dashboard-card-content {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.3) transparent; /* Light mode colors */
+}
+
+@media (prefers-color-scheme: dark) {
+    .dashboard-grid .dashboard-card .dashboard-card-content {
+        scrollbar-color: rgba(75, 85, 99, 0.3) transparent; /* Dark mode colors */
+    }
 }
