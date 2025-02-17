@@ -24,6 +24,9 @@ export default function Index() {
           </p>
         </div>
         <div className="flex justify-center btn-group">
+          <Link to="/dashboard" className="btn-secondary text-center">
+            To Dashboard
+          </Link>
           <Link to="/about" className="btn-secondary text-center">
             About
           </Link>
